@@ -6,7 +6,7 @@ class ContactService {
   }
   async getAll() {
     const response = await this.api.get("/");
-    return response.data.data; // Lấy data.data vì backend trả về {data: [...]}
+    return response.data.data;
   }
   async create(data) {
     const response = await this.api.post("/", data);
