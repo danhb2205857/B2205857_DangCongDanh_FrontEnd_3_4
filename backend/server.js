@@ -13,5 +13,5 @@ import { appRoute } from "./appRoute"
 appRoute(app)
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+  console.log(`Ứng dụng đang chạy trên cổng: ${port}`)
 })

@@ -11,16 +11,23 @@ export async function findAll(req, res) {
 }
 
 export async function create(req, res) {
-  const contact = await Contact.insertOne(req.body);
+  try {
+    const contact = await Contact.create(req.body);
 
-  if (contact) {
-    return res.status(201).json({
-      message: "Thêm contact thành công",
-      data: contact,
-    });
-  } else {
-    return res.status(500).json({
-      message: "Thêm contact không thành công",
+    if (contact) {
+      return res.status(201).json({
+        message: "Thêm contact thành công",
+        data: contact,
+      });
+    } else {
+      return res.status(500).json({
+        message: "Thêm contact không thành công",
+      });
+    }
+  } catch (error) {
+    return res.status(400).json({
+      message: "Dữ liệu không hợp lệ",
+      error: error.message
     });
   }
 }
@@ -50,24 +57,64 @@ export async function deleteAll(req, res) {
   export async function findByPk(req, res) {
     const { _id } = req.params
 
-    const data = await Contact.find({ _id: _id });
+    try {
+      const data = await Contact.findById(_id);
 
-    if(data){
-      return res.status(200).json({
-      message: "Lấy contact thành công",
-      data: data,
-    });
+      if(data){
+        return res.status(200).json({
+        message: "Lấy contact thành công",
+        data: data,
+      });
+      }
+      else {
+        return res.status(404).json({
+        message: "Contact không tồn tại"
+      });
+      } 
+    } catch (error) {
+      return res.status(400).json({
+        message: "ID không hợp lệ",
+        error: error.message
+      });
     }
-    else {
-      return res.status(500).json({
-      message: "Lấy contact không thành công"
-    });
-    } 
   }
   export async function update(req, res) {
     const { _id } = req.params
 
-    const data = await Contact.find({ _id: _id });
+    try {
+      const data = await Contact.findById(_id);
+
+      if(!data){
+        return res.status(404).json({
+        message: "Contact không tồn tại"
+      });
+      }
+
+      const update = await Contact.updateOne({ _id }, req.body)
+
+      if(update.modifiedCount > 0) {
+        const updatedContact = await Contact.findById(_id);
+        return res.status(200).json({
+          message: "Cập nhật contact thành công",
+          data: updatedContact
+        });
+      } else {
+        return res.status(500).json({
+          message: "Cập nhật contact không thành công"
+        });
+      }
+    } catch (error) {
+      return res.status(400).json({
+        message: "ID không hợp lệ",
+        error: error.message
+      });
+    }
+  }
+export async function deleteOne(req, res) {
+  const { _id } = req.params
+
+  try {
+    const data = await Contact.findById(_id);
 
     if(!data){
       return res.status(404).json({
@@ -75,14 +122,21 @@ export async function deleteAll(req, res) {
     });
     }
 
-    const update = await Contact.updateOne({ _id }, data)
+    const deleteResult = await Contact.deleteOne({ _id });
 
-    if(!update) {
+    if(deleteResult.deletedCount > 0) {
+      return res.status(200).json({
+        message: "Xóa contact thành công"
+      });
+    } else {
       return res.status(500).json({
-      message: "Lấy contact không thành công"
-    });
-    } 
-    return res.status(500).json({
-      message: "Cập nhật contact thành công"
+        message: "Xóa contact không thành công"
+      });
+    }
+  } catch (error) {
+    return res.status(400).json({
+      message: "ID không hợp lệ",
+      error: error.message
     });
   }
+}

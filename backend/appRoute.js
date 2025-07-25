@@ -20,6 +20,7 @@ export function appRoute(app) {
     
     router.put('/contacts/:_id', asyncHandler(contactController.update))
     
+    router.delete('/contacts/:_id', asyncHandler(contactController.deleteOne))
 
     app.use('/api/', router);
 }
